@@ -3,11 +3,9 @@
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include "OTA.h"
-#include "PapertrailLogger.h"
 
-OTA::OTA(PapertrailLogger *logger, const char *hostname)
+OTA::OTA(const char *hostname)
 {
-    this->logger = logger;
     ArduinoOTA.setHostname(hostname);
     ArduinoOTA
         .onStart([this]() {
@@ -18,10 +16,10 @@ OTA::OTA(PapertrailLogger *logger, const char *hostname)
                 type = "filesystem";
 
             // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-            this->logger->info()->println("Start updating " + type);
+            Serial.println("Start updating " + type);
         })
         .onEnd([this]() {
-            this->logger->info()->println("Update Complete");
+            Serial.println("Update Complete");
             digitalWrite(33, LOW);
         })
         .onProgress([](unsigned int progress, unsigned int total) {
@@ -32,15 +30,15 @@ OTA::OTA(PapertrailLogger *logger, const char *hostname)
         .onError([this](ota_error_t error) {
             Serial.printf("Error[%u]: ", error);
             if (error == OTA_AUTH_ERROR)
-                this->logger->error()->println("Auth Failed");
+                Serial.println("Auth Failed");
             else if (error == OTA_BEGIN_ERROR)
-                this->logger->error()->println("Begin Failed");
+                Serial.println("Begin Failed");
             else if (error == OTA_CONNECT_ERROR)
-                this->logger->error()->println("Connect Failed");
+                Serial.println("Connect Failed");
             else if (error == OTA_RECEIVE_ERROR)
-                this->logger->error()->println("Receive Failed");
+                Serial.println("Receive Failed");
             else if (error == OTA_END_ERROR)
-                this->logger->error()->println("End Failed");
+                Serial.println("End Failed");
             digitalWrite(33, LOW);
         });
     ArduinoOTA.begin();

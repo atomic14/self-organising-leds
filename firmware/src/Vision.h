@@ -2,9 +2,6 @@
 #define __vision__h
 #include "esp_camera.h"
 
-class PapertrailLogger;
-class Leds;
-
 class Frame
 {
 public:
@@ -18,12 +15,9 @@ public:
 
 class Vision
 {
-private:
-    PapertrailLogger *logger;
-    Leds *leds;
 
 public:
-    Vision(PapertrailLogger *logger);
+    Vision();
     Frame *getFrame();
 };
 

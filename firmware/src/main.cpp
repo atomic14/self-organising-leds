@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "vision.h"
-#include "PapertrailLogger.h"
 #include "ota.h"
 #include "webcontrol.h"
 #include "leds.h"
@@ -19,7 +18,6 @@ const char *password = << YOU PASSWORD >> ;
 Vision *vision;
 OTA *ota = NULL;
 WebControl *webControl = NULL;
-PapertrailLogger *logger = NULL;
 Leds *leds = NULL;
 FrameBuffer *frameBuffer;
 
@@ -40,12 +38,11 @@ void setup()
     delay(5000);
     ESP.restart();
   }
-  logger = new PapertrailLogger("logs5.papertrailapp.com", 34663, LogLevel::Info, "\033[0;34m", "leds", "ledsdisplay");
-  logger->println("Started up");
-  ota = new OTA(logger, "espcam");
-  leds = new Leds(LED_COUNT, logger, ota);
-  vision = new Vision(logger);
-  webControl = new WebControl(logger, vision, leds, frameBuffer);
+  Serial.println("Started up");
+  ota = new OTA("espcam");
+  leds = new Leds(LED_COUNT, ota);
+  vision = new Vision();
+  webControl = new WebControl(vision, leds, frameBuffer);
   leds->calibrate(vision);
   frameBuffer = new FrameBuffer(100, 100);
   frameBuffer->clear();

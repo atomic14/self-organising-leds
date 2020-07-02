@@ -2,15 +2,13 @@
 #include <FastLED.h>
 #include "Leds.h"
 #include "Point2D.h"
-#include "PapertrailLogger.h"
 #include "Vision.h"
 #include "OTA.h"
 #include "FrameBuffer.h"
 #define LED_PIN 16
 
-Leds::Leds(int ledCount, PapertrailLogger *logger, OTA *ota)
+Leds::Leds(int ledCount, OTA *ota)
 {
-    this->logger = logger;
     this->ota = ota;
     // allocate leds
     this->ledCount = ledCount;
@@ -32,7 +30,7 @@ Leds::~Leds()
 
 bool Leds::calibrate(Vision *vision)
 {
-    logger->info()->println("Started calibration");
+    Serial.println("Started calibration");
     minX = 10000;
     maxX = -1;
     minY = 10000;
@@ -107,7 +105,7 @@ bool Leds::calibrate(Vision *vision)
         }
         else
         {
-            logger->info()->printf("Failed to get location for LED %d\n", ledIdx);
+            Serial.printf("Failed to get location for LED %d\n", ledIdx);
             ledPositions[ledIdx] = Point2D({-1, -1});
         }
         // set the pixel back to off
@@ -117,7 +115,7 @@ bool Leds::calibrate(Vision *vision)
     clear();
     show();
     digitalWrite(33, LOW);
-    logger->info()->println("Done calibration");
+    Serial.println("Done calibration");
     return true;
 }
 

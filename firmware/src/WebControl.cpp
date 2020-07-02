@@ -3,7 +3,6 @@
 #include "SPIFFS.h"
 #include "Vision.h"
 #include "WebControl.h"
-#include "PapertrailLogger.h"
 #include "ESPAsyncWebServer.h"
 #include "AsyncJson.h"
 #include "Leds.h"
@@ -12,10 +11,9 @@
 
 AsyncWebServer server(80);
 
-WebControl::WebControl(PapertrailLogger *logger, Vision *vision, Leds *leds, FrameBuffer *frameBuffer)
+WebControl::WebControl(Vision *vision, Leds *leds, FrameBuffer *frameBuffer)
 {
     currentMode = RUNNING;
-    this->logger = logger;
     this->vision = vision;
     this->leds = leds;
     this->frameBuffer = frameBuffer;

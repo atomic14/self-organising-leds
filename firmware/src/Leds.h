@@ -6,7 +6,6 @@
 #include "RGBPixel.h"
 
 class Point2D;
-class PapertrailLogger;
 class Vision;
 class OTA;
 class FrameBuffer;
@@ -14,7 +13,6 @@ class FrameBuffer;
 class Leds
 {
 private:
-    PapertrailLogger *logger;
     OTA *ota;
     CRGB *leds;
     void setLEDColor(int position, const RGBPixel &color);
@@ -23,7 +21,7 @@ private:
 public:
     int ledCount;
     Point2D *ledPositions;
-    Leds(int ledCount, PapertrailLogger *logger, OTA *ota);
+    Leds(int ledCount, OTA *ota);
     ~Leds();
     bool calibrate(Vision *vision);
     void showImage(FrameBuffer *frameBuffer);

@@ -3,7 +3,6 @@
 #include "Vision.h"
 #define CAMERA_MODEL_AI_THINKER
 #include "camera_pins.h"
-#include "PapertrailLogger.h"
 
 Frame::Frame(camera_fb_t *fb)
 {
@@ -18,9 +17,8 @@ Frame::~Frame()
     free(pixels);
 }
 
-Vision::Vision(PapertrailLogger *logger)
+Vision::Vision()
 {
-    this->logger = logger;
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
     config.ledc_timer = LEDC_TIMER_0;

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <FastLED.h>
+#include <Preferences.h>
 #include "Leds.h"
 #include "Point2D.h"
 #include "Vision.h"
@@ -16,10 +17,34 @@ Leds::Leds(int ledCount, OTA *ota)
     FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, ledCount);
     // allocate space to store the positions of the Leds
     ledPositions = new Point2D[ledCount];
+    // initialise to unknown position
     for (int ledIdx = 0; ledIdx < ledCount; ledIdx++)
     {
         ledPositions[ledIdx] = Point2D({-1, -1});
     }
+    // read from preferences if available
+    preferences = new Preferences();
+    preferences->begin("organised-leds", false);
+    isCalibrated = preferences->getBool("calibrated");
+    Serial.printf("Is Calibrated %d\n", isCalibrated);
+    if (isCalibrated)
+    {
+        preferences->getBytes("positions", ledPositions, sizeof(Point2D) * ledCount);
+        // calculate the bounds
+        maxX = 0;
+        maxY = 0;
+        minX = 1000;
+        minY = 1000;
+        for (int ledIdx = 0; ledIdx < ledCount; ledIdx++)
+        {
+            maxX = max(ledPositions[ledIdx].x, maxX);
+            maxY = max(ledPositions[ledIdx].y, maxY);
+            minX = min(ledPositions[ledIdx].x, minX);
+            minY = min(ledPositions[ledIdx].y, minY);
+        }
+        Serial.printf("Led bounds (%d, %d), (%d, %d)\n", minX, minY, maxX, maxY);
+    }
+    preferences->end();
 }
 
 Leds::~Leds()
@@ -59,6 +84,8 @@ bool Leds::calibrate(Vision *vision)
             delete allOffFrame;
             return false;
         }
+        allOffFrame->guassianBlur();
+        oneOnFrame->guassianBlur();
         uint8_t *oneOnPixels = oneOnFrame->pixels;
         uint8_t *allOffPixels = allOffFrame->pixels;
         for (int y = 0; y < allOffFrame->height; y++)
@@ -95,13 +122,14 @@ bool Leds::calibrate(Vision *vision)
         delete oneOnFrame;
         if (pointWeight > 0)
         {
-            int x = xPos / pointWeight;
-            int y = yPos / pointWeight;
+            int16_t x = xPos / pointWeight;
+            int16_t y = yPos / pointWeight;
             minX = min(minX, x);
             minY = min(minY, y);
             maxX = max(maxX, x);
             maxY = max(maxY, y);
             ledPositions[ledIdx] = Point2D({x, y});
+            Serial.printf("LED %d is at %d %d\n", ledIdx, x, y);
         }
         else
         {
@@ -115,6 +143,8 @@ bool Leds::calibrate(Vision *vision)
     clear();
     show();
     digitalWrite(33, LOW);
+    isCalibrated = true;
+    storePositions();
     Serial.println("Done calibration");
     return true;
 }
@@ -132,6 +162,29 @@ void Leds::setLedRGB(int led, uint8_t r, uint8_t g, uint8_t b, bool show)
     {
         FastLED.show();
     }
+}
+
+void Leds::storePositions()
+{
+    preferences->begin("organised-leds", false);
+    preferences->putBool("calibrated", true);
+    int written = preferences->putBytes("positions", ledPositions, sizeof(Point2D) * ledCount);
+    Serial.printf("Wrote %d bytes to preferences\n", written);
+    preferences->end();
+}
+
+void Leds::setLedPosition(int led, uint16_t x, uint16_t y)
+{
+    ledPositions[led].x = x;
+    ledPositions[led].y = y;
+}
+
+void Leds::setBounds(int16_t minX, int16_t minY, int16_t maxX, int16_t maxY)
+{
+    this->minX = minX;
+    this->minY = minY;
+    this->maxX = maxX;
+    this->maxY = maxY;
 }
 
 void Leds::show()

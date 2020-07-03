@@ -9,11 +9,10 @@
 #include "animations/Expanding.h"
 #include "animations/Wipe.h"
 #include "animations/Marquee.h"
-
-const char *ssid = << YOUR SSID >> ;
-const char *password = << YOU PASSWORD >> ;
+#include "WiFiCredentials.h"
 
 #define LED_COUNT 100
+#define CAMERA_ENABLED 1
 
 Vision *vision;
 OTA *ota = NULL;
@@ -31,19 +30,28 @@ void setup()
   // switch it on
   digitalWrite(33, LOW);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, PASSWORD);
   if (WiFi.waitForConnectResult() != WL_CONNECTED)
   {
     Serial.println("Connection Failed! Rebooting...");
     delay(5000);
     ESP.restart();
   }
+  WiFi.setSleep(false);
   Serial.println("Started up");
   ota = new OTA("espcam");
   leds = new Leds(LED_COUNT, ota);
-  vision = new Vision();
+  vision = new Vision(CAMERA_ENABLED);
   webControl = new WebControl(vision, leds, frameBuffer);
-  leds->calibrate(vision);
+  // auto callibarate on startup
+  if (CAMERA_ENABLED)
+  {
+    // calibrate if needed
+    if (!leds->isCalibrated)
+    {
+      leds->calibrate(vision);
+    }
+  }
   frameBuffer = new FrameBuffer(100, 100);
   frameBuffer->clear();
 }
@@ -53,9 +61,7 @@ AnimationBase *animations[5] = {
     new Wipe(LEFT),
     new Wipe(UP),
     new Wipe(DOWN),
-    new Wipe(RIGHT),
-    //new Marquee("HELLO WORLD")
-};
+    new Wipe(RIGHT)};
 int animationIndex = 0;
 unsigned long lastTime = 0;
 

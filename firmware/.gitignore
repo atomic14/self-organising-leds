@@ -4,3 +4,5 @@
 .vscode/launch.json
 .vscode/ipch
 venv
+data
+src/WiFiCredentials.h

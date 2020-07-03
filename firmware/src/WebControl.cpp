@@ -3,8 +3,8 @@
 #include "SPIFFS.h"
 #include "Vision.h"
 #include "WebControl.h"
-#include "ESPAsyncWebServer.h"
-#include "AsyncJson.h"
+#include <ESPAsyncWebServer.h>
+#include <AsyncJson.h>
 #include "Leds.h"
 #include "FrameBuffer.h"
 #include "Point2D.h"
@@ -23,6 +23,13 @@ WebControl::WebControl(Vision *vision, Leds *leds, FrameBuffer *frameBuffer)
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Methods", "GET, PUT, POST");
     DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "*");
+
+    server.on("/rssi", [this](AsyncWebServerRequest *request) {
+        long rssi = WiFi.RSSI();
+        char buffer[100];
+        sprintf(buffer, "%ld", rssi);
+        request->send(200, "text/plain", buffer);
+    });
 
     server.on("/raw_image", [this](AsyncWebServerRequest *request) {
         digitalWrite(33, HIGH);
@@ -90,12 +97,64 @@ WebControl::WebControl(Vision *vision, Leds *leds, FrameBuffer *frameBuffer)
         // handle the body - we should really buffer up the body data but currently it's short enough...
         [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
             digitalWrite(33, HIGH);
-            for (int i = 0; i < this->leds->ledCount; i++)
+            // store the data in the request tempObject
+            if (!request->_tempObject)
             {
-                this->leds->setLedRGB(i, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
+                request->_tempObject = malloc(total);
             }
-            this->leds->show();
-            request->send(200, "application/json", "OK");
+            memcpy(((uint8_t *)request->_tempObject) + index, data, len);
+            if (index + len == total)
+            {
+                uint8_t *rgbData = (uint8_t *)request->_tempObject;
+                for (int i = 0; i < this->leds->ledCount; i++)
+                {
+                    this->leds->setLedRGB(i, rgbData[i * 3], rgbData[i * 3 + 1], rgbData[i * 3 + 2], false);
+                }
+                this->leds->show();
+                request->send(200, "application/json", "OK");
+            }
+            digitalWrite(33, LOW);
+        });
+
+    server.on(
+        "/positions", WebRequestMethod::HTTP_POST,
+        // nothing to do in the request
+        [](AsyncWebServerRequest *request) {},
+        // no file upload
+        NULL,
+        // handle the body - we should really buffer up the body data but currently it's short enough...
+        [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+            digitalWrite(33, HIGH);
+            // store the data in the request tempObject
+            if (!request->_tempObject)
+            {
+                request->_tempObject = malloc(total);
+            }
+            memcpy(((uint8_t *)request->_tempObject) + index, data, len);
+            if (index + len == total)
+            {
+                uint16_t *positions = (uint16_t *)request->_tempObject;
+                int minx = 1000;
+                int miny = 1000;
+                int maxx = 0;
+                int maxy = 0;
+                for (int i = 0; i < this->leds->ledCount; i++)
+                {
+                    int x = positions[i * 2];
+                    int y = positions[i * 2 + 1];
+                    Serial.printf("Led %d is at %d %d\n", i, x, y);
+                    minx = min(x, minx);
+                    miny = min(y, miny);
+                    maxx = max(x, maxx);
+                    maxy = max(y, maxy);
+                    this->leds->setLedPosition(i, x, y);
+                }
+                this->leds->setBounds(minx, miny, maxx, maxy);
+                this->leds->storePositions();
+                this->leds->isCalibrated = true;
+                Serial.printf("Bounds %d, %d, %d, %d\n", minx, miny, maxx, maxy);
+                request->send(200, "application/json", "OK");
+            }
             digitalWrite(33, LOW);
         });
 

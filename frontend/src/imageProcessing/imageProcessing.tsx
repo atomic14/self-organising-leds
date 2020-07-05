@@ -1,8 +1,8 @@
 import * as api from "../api/ledsApi";
 
 function getVideoFrame(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
-  const width = video.videoWidth / 2;
-  const height = video.videoHeight / 2;
+  const width = video.videoWidth;
+  const height = video.videoHeight;
   const context = canvas.getContext("2d");
   // draw the video to the canvas
   context!.drawImage(video, 0, 0, width, height);

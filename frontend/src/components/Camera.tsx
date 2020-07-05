@@ -21,7 +21,7 @@ export default function Camera({
         });
         const canPlayListener = () => {
           onVideoReady(video);
-          alert(`canPlay 1 ${video.videoWidth} x ${video.videoHeight}`);
+          //alert(`canPlay 1 ${video.videoWidth} x ${video.videoHeight}`);
           setVideoWidth(video.videoWidth);
           setVideoHeight(video.videoHeight);
           video.removeEventListener("canplay", canPlayListener);

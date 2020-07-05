@@ -1,22 +1,3 @@
-// get a raw frame from the camera - 160x120 pixels greyscale
-export async function getFrame(host: string): Promise<Uint8Array> {
-  const response = await fetch(`${host}/raw_image`);
-  const blob = await response.blob();
-  const arrayBuffer = await (blob as any).arrayBuffer();
-  const uint8Array = new Uint8Array(arrayBuffer);
-  return uint8Array;
-}
-
-// clear all the leds
-export async function clear(host: string) {
-  await fetch(`${host}/clear`);
-}
-
-export interface ILedPosition {
-  x: number;
-  y: number;
-}
-
 function blobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     let fr = new FileReader();
@@ -29,6 +10,25 @@ function blobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
     };
     fr.readAsArrayBuffer(blob);
   });
+}
+
+// get a raw frame from the camera - 160x120 pixels greyscale
+export async function getFrame(host: string): Promise<Uint8Array> {
+  const response = await fetch(`${host}/raw_image`);
+  const blob = await response.blob();
+  const arrayBuffer = await blobToArrayBuffer(blob);
+  const uint8Array = new Uint8Array(arrayBuffer);
+  return uint8Array;
+}
+
+// clear all the leds
+export async function clear(host: string) {
+  await fetch(`${host}/clear`);
+}
+
+export interface ILedPosition {
+  x: number;
+  y: number;
 }
 
 export async function getLedPositions(host: string): Promise<ILedPosition[]> {

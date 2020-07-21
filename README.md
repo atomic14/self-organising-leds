@@ -47,8 +47,8 @@ pip install -r requirements.txt
 Create a file `WifiCredentials.h` in the `firmware/src` and populate it with your wifi SSID and PASSWORD:
 
 ```
-#define SSID "CMGResearch"
-#define PASSWORD "02087552867"
+#define SSID "<SSID>"
+#define PASSWORD "<PASSWORD>"
 ```
 
 In `main.cpp` update the defines for the number of LEDs you have and if you have an ESP-CAM or a normal ESP32 board.

@@ -100,8 +100,8 @@ export async function calibrateUsingCamera(
   espHost: string,
   video: HTMLVideoElement
 ) {
-  const width = video.videoWidth / 2;
-  const height = video.videoHeight / 2;
+  const width = video.videoWidth;
+  const height = video.videoHeight;
   // create a canvas element to capture video stills
   const canvas = document.createElement("canvas");
   canvas.width = width;

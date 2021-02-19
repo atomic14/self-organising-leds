@@ -1,3 +1,4 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z734F5Y)
 # Self Organising LEDs
 
 [![Demo Video](https://img.youtube.com/vi/Ueim2Ko8VWo/0.jpg)](https://www.youtube.com/watch?v=Ueim2Ko8VWo)

@@ -1,7 +1,12 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z734F5Y)
+
 # Self Organising LEDs
 
 [![Demo Video](https://img.youtube.com/vi/Ueim2Ko8VWo/0.jpg)](https://www.youtube.com/watch?v=Ueim2Ko8VWo)
+
+And the latest demo on the Christmas tree:
+
+[![Demo Video](https://img.youtube.com/vi/Ic_MmhiT8qE/0.jpg)](https://www.youtube.com/watch?v=Ic_MmhiT8qE)
 
 This project uses an esp32 board to drive a string of WS2118 LEDs. It uses some basic image processing to detect where the LEDs are so that you can display geometric patterns even if the LEDs are not arranged in a grid.
 

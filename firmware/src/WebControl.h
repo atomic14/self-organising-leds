@@ -7,7 +7,10 @@ class FrameBuffer;
 
 typedef enum
 {
-    RUNNING,
+    RUNNING_ANIMATION,
+    RUNNING_AUDIO,
+    RUNNING_FLAMES,
+    RUNNING_RANDOM,
     CALIBRATING,
     PAUSED
 } MODE;
@@ -20,7 +23,8 @@ private:
     Leds *leds;
 
 public:
-    MODE currentMode;
+    volatile MODE currentMode;
+    float audioScale = 1.0;
     WebControl(Vision *vision, Leds *leds, FrameBuffer *frameBuffer);
 };
 

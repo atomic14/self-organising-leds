@@ -174,5 +174,5 @@ export async function calibrateUsingCamera(
   // send the LED positions up to the esp board
   await api.setLedPositions(espHost, ledPositions);
   // resume animations
-  await api.run(espHost);
+  await api.runAnimation(espHost);
 }

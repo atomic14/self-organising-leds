@@ -6,7 +6,7 @@
 #include "Vision.h"
 #include "OTA.h"
 #include "FrameBuffer.h"
-#define LED_PIN 16
+#define LED_PIN 21
 
 Leds::Leds(int ledCount, OTA *ota)
 {
@@ -152,6 +152,40 @@ bool Leds::calibrate(Vision *vision)
 void Leds::clear()
 {
     memset(leds, 0, sizeof(CRGB) * ledCount);
+    FastLED.show();
+}
+
+void Leds::randomIze()
+{
+    for (int ledIdx = 0; ledIdx < ledCount; ledIdx++)
+    {
+        int r = random(7);
+        switch (r)
+        {
+        case 0:
+            setLedRGB(ledIdx, 255, 0, 0, false);
+            break;
+        case 1:
+            setLedRGB(ledIdx, 0, 255, 0, false);
+            break;
+        case 2:
+            setLedRGB(ledIdx, 0, 0, 255, false);
+            break;
+        case 3:
+            setLedRGB(ledIdx, 0, 255, 255, false);
+            break;
+        case 4:
+            setLedRGB(ledIdx, 255, 255, 0, false);
+            break;
+        case 5:
+            setLedRGB(ledIdx, 255, 0, 255, false);
+            break;
+        case 6:
+        default:
+            setLedRGB(ledIdx, 255, 255, 255, true);
+            break;
+        }
+    }
     FastLED.show();
 }
 

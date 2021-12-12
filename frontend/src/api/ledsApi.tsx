@@ -86,8 +86,31 @@ export async function pause(host: string) {
 }
 
 // resume the animation loop
-export async function run(host: string) {
-  await fetch(`${host}/run`);
+export async function runAnimation(host: string) {
+  await fetch(`${host}/run_animation`);
+}
+
+// resume the audio loop
+export async function runAudio(host: string) {
+  await fetch(`${host}/run_audio`);
+}
+
+// resume the flames loop
+export async function runFlames(host: string) {
+  await fetch(`${host}/run_flames`);
+}
+
+// resume the random loop
+export async function runRandom(host: string) {
+  await fetch(`${host}/run_random`);
+}
+
+// set the audio scale
+export async function setAudioScale(host: string, scale: number) {
+  await fetch(`${host}/scale`, {
+    method: "POST",
+    body: JSON.stringify({ scale }),
+  });
 }
 
 // start the calibration process

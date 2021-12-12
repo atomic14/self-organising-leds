@@ -32,6 +32,7 @@ public:
     void setLedPosition(int led, uint16_t x, uint16_t y);
     void storePositions();
     void setBounds(int16_t minx, int16_t miny, int16_t maxx, int16_t maxy);
+    void randomIze();
     void clear();
     void show();
 };

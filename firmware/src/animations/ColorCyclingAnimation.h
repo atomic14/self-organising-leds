@@ -7,14 +7,13 @@ class ColorCyclingAnimation : public AnimationBase
 {
 protected:
     int colorIndex;
-    uint16_t colors[8] = {
+    uint16_t colors[7] = {
         0x001F,
         0xF800,
         0x07E0,
         0x07FF,
         0xF81F,
         0xFFE0,
-        0xFFFF,
         0x0000};
 
 public:
@@ -38,7 +37,7 @@ public:
     }
     bool isDone() override
     {
-        return colorIndex == 8;
+        return colorIndex == 7;
     }
 };
 

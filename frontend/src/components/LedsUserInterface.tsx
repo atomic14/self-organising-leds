@@ -4,11 +4,13 @@ import * as api from "../api/ledsApi";
 import * as imageProcessing from "../imageProcessing/imageProcessing";
 import Switch from "./Switch";
 import Camera from "./Camera";
+import _ from 'lodash';
 
 export default function LedsUserInterface() {
   const [currentFrame, setCurrentFrame] = useState<Uint8Array>();
   const [ledPositions, setLedPositions] = useState<api.ILedPosition[]>();
   const [usePhoneCamera, setUsePhoneCamera] = useState(false);
+  const [audioScale, setAudioScale] = useState(20)
   const [video, setVideo] = useState<HTMLVideoElement>();
 
   const isDev = window.location.hostname === "localhost";
@@ -31,8 +33,20 @@ export default function LedsUserInterface() {
     await api.pause(espAddress);
   }
 
-  async function run() {
-    await api.run(espAddress);
+  async function runAnimation() {
+    await api.runAnimation(espAddress);
+  }
+
+  async function runAudio() {
+    await api.runAudio(espAddress);
+  }
+
+  async function runFlames() {
+    await api.runFlames(espAddress);
+  }
+
+  async function runRandom() {
+    await api.runRandom(espAddress);
   }
 
   async function grabFrame() {
@@ -46,6 +60,14 @@ export default function LedsUserInterface() {
     setCurrentFrame(bytes);
     setLedPositions(ledPositions);
   }
+
+  async function _updateAudioScale(scale: number) {
+    console.log(scale / 20.0);
+    setAudioScale(scale);
+    api.setAudioScale(espAddress, scale / 20.0);
+  }
+
+  const updateAudioScale = _.throttle(_updateAudioScale, 100);
 
   return (
     <div style={{ width: 320, display: "flex", flexDirection: "column" }}>
@@ -81,13 +103,17 @@ export default function LedsUserInterface() {
       <button onClick={clear}>Clear</button>
       <button onClick={calibrate}>Calibrate</button>
       <button onClick={pause}>Pause</button>
-      <button onClick={run}>Run</button>
+      <button onClick={runAnimation}>Run Animation</button>
+      <button onClick={runAudio}>Run Audio</button>
+      <button onClick={runFlames}>Run Flames</button>
+      <button onClick={runRandom}>Run Random</button>
       {!usePhoneCamera && (
         <>
           <button onClick={showLedPositions}>Show Locations</button>
           <button onClick={() => grabFrame()}>Grab Frame</button>
         </>
       )}
+      <input value={audioScale} min={0} max={100} style={{ marginTop: 40, marginBottom: 40 }} type="range" onChange={(event: React.ChangeEvent<HTMLInputElement>) => { updateAudioScale(event.currentTarget.valueAsNumber) }}></input>
     </div>
   );
 }

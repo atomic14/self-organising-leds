@@ -20,11 +20,11 @@ public:
     }
     void draw(FrameBuffer *frame) override
     {
-        int offset = msgLen * frame->width * elapsed / totalTime;
+        int offset = (msgLen + 2) * frame->width * elapsed / totalTime;
         frame->clear();
         for (int i = 0; i < message.length(); i++)
         {
-            frame->drawChar(i * 100 - offset, 80, message.charAt(i), 0xffff, 0, 3);
+            frame->drawChar(i * 100 - offset + 200, 80, message.charAt(i), 0x001F, 0, 3);
         }
     }
     bool isDone() override
